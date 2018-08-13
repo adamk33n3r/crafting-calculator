@@ -1,0 +1,44 @@
+<div class='container'>
+  <div class='mt-4 row'>
+    <div class='col-md-4 col-6'>
+      <button type='button' class='btn btn-outline-dark' (click)='dump()'>
+        <i class='far fa-copy'></i>
+        Dump Items to Clipboard
+      </button>
+    </div>
+    <div class='col-md-4 col-6'>
+      <button type='button' class='btn btn-outline-dark' (click)='import()'>
+        <i class='fa fa-paste'></i>
+        Import Items from Clipboard
+      </button>
+    </div>
+    <div class='col-md-4 mt-2 mt-md-0'>
+      <button type='button' class='btn btn-danger float-right' (click)='reset()'>
+        <i class='far fa-trash-alt'></i> Reset to Default
+      </button>
+    </div>
+  </div>
+
+  <div class='mt-2'>
+    <input type='search' class='form-control' placeholder='Search...' (input)='search($event)' />
+  </div>
+
+  <div class='row mt-2'>
+    <div class='col-6'>
+      <button type='button' class='btn btn-block btn-primary' (click)='sortByCreated()'>
+        Created <i class='fa' [ngClass]='{ "fa-chevron-down": !sortCreatedReverse, "fa-chevron-up": sortCreatedReverse }'></i>
+      </button>
+    </div>
+    <div class='col-6'>
+      <button type='button' class='btn btn-block btn-primary' (click)='sortByName()'>
+        Name <i class='fa' [ngClass]='{ "fa-chevron-down": !sortNameReverse, "fa-chevron-up": sortNameReverse }'></i>
+      </button>
+    </div>
+  </div>
+
+  <div class='row mt-4'>
+    <div class='col-sm-6 col-md-4 col-lg-3 mb-4' *ngFor='let item of items'>
+      <item [item]='item'></item>
+    </div>
+  </div>
+</div>

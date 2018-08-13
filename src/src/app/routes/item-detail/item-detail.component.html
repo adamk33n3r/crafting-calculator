@@ -1,0 +1,71 @@
+<div class='container'>
+  <h1>{{ stateAsName }} Item</h1>
+
+  <form [formGroup]='formGroup' autocomplete='off'>
+    <label for='item_id'>ID (Auto generated from Name but can be changed)</label>
+    <input type='text' class='form-control' id='item_id' placeholder='redstone_dust' formControlName='id' required data-lpignore='true' />
+    <div class='invalid-feedback' *ngIf='formGroup.hasError("exists", "id")'>There is already an item with this ID</div>
+
+    <label for='item_name'>Name</label>
+    <input type='text' class='form-control' id='item_name' placeholder='Redstone Dust' formControlName='name' required data-lpignore='true' #nameInput />
+
+    <label for='item_icon'>Icon <img class='item-icon' [src]='formGroup.get("icon").value' /></label>
+    <input type='text' class='form-control' id='item_icon' placeholder='Paste image here' formControlName='icon' data-lpignore='true' readonly #iconInput />
+    <br />
+
+    <div class='form-check'>
+      <input type='checkbox' class='form-check-input' id='base_item' formControlName='isBaseItem' />
+      <label class='form-check-label' for='base_item'>Is Base Item (no recipe)</label>
+    </div>
+
+    <div [hidden]='isBaseItem' formGroupName='recipe'>
+      <h3>Recipe</h3>
+      <table class='table table-striped'>
+        <tbody>
+          <tr *ngFor='let ingredient of ingredients.controls; let i = index' formArrayName='ingredients'>
+            <td [formGroupName]='i'>
+              <div class='form-row'>
+                <div class='col-2'>
+                  <input type='number' class='form-control' min='1' max='9' formControlName='count' required onclick='this.select()' />
+                </div>
+                <div class='col-8'>
+                  <ng-template #itemTemplate let-item='item'>
+                    <icon [item]='item'></icon>
+                  </ng-template>
+                  <mf-select [items]='items' formControlName='item' [optionTemplate]='itemTemplate' [selectedTemplate]='itemTemplate' required></mf-select>
+                </div>
+                <div class='col-2' *ngIf='i > 0'>
+                  <button type='button' class='btn btn-danger float-right' (click)='remove(i)'>&nbsp;<i class='fa fa-times'></i>&nbsp;</button>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div class='mb-2 row'>
+        <div class='col-4'>
+          <button type='button' class='btn btn-primary' (click)='add()'><i class='fa fa-plus'></i> Add Ingredient</button>
+        </div>
+        <div class='col-8'>
+          <div class='form-inline float-right'>
+            <label for='output_count'>Output Count&nbsp;</label>
+            <input type='number' class='form-control' id='output_count' min='1' max='64' formControlName='outputCount' onclick='this.select()' />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class='clearfix'>
+      <div class='float-left'><i>Every input is required</i></div>
+      <button type='button' class='btn btn-success float-right' (click)='save()' [disabled]='formGroup.invalid'>
+        <i class='fa fa-check'></i> Save
+      </button>
+    </div>
+  </form>
+  <pre *ngIf='DEBUG' style='background: lightgrey; padding: 10px' class='mt-3'>
+  {{ formGroup.value | json }}
+  {{ formGroup.status | json }}
+  {{ formGroup.errors | json }}
+  </pre>
+
+</div>

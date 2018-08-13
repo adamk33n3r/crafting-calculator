@@ -1,0 +1,67 @@
+<div class='jumbotron'>
+  <h1 class='display-4'>Recipe Calculator</h1>
+  <p class='lead'>This tool will show you the base ingredients of a recipe. Go to the New Item page to add items and their recipes.</p>
+  <hr class='my-4' />
+  <p *ngIf='DEBUG'>Can get laggy with the console open. <i class='text-danger'>You have been warned!</i></p>
+</div>
+
+<div class='container'>
+  <div class='row mt-4'>
+    <div class='col-2'>
+      <label>Count</label>
+    </div>
+    <div class='col-10'>
+      <label>Item</label>
+    </div>
+  </div>
+  <div class='row mb-3' *ngFor='let itemRow of itemRows'>
+
+    <div class='col-2'>
+      <input type='number' class='form-control' min='1' [(ngModel)]='itemRow.count' onclick='this.select()' (ngModelChange)='save()' />
+    </div>
+
+    <div class='col-10'>
+      <ng-template #itemTemplate let-item='item'>
+        <icon [item]='item'></icon>
+      </ng-template>
+      <mf-select [items]='items' [optionTemplate]='itemTemplate' [selectedTemplate]='itemTemplate' [(ngModel)]='itemRow.item' (ngModelChange)='save()' ></mf-select>
+    </div>
+
+  </div>
+
+  <div class='mt-4'>
+    <button type='button' class='btn btn-primary' (click)='addItem()'>
+      <i class='fa fa-plus'></i>
+      Add Item
+    </button>
+    <button type='button' class='btn btn-danger float-right' (click)='clear()'>
+      <i class='fa fa-times'></i>
+      Clear
+    </button>
+  </div>
+
+  <div class='card mt-4' *ngIf='hasItemSelected()'>
+    <div class='card-header'>
+      <div class='row'>
+        <div class='col-2'>Count</div>
+        <div class='col-3'>Stacks</div>
+        <div class='col-7'>
+          Ingredient
+          <button type='button' class='btn btn-sm btn-outline-info float-right' style='margin: -4px;' (click)='export()'>
+            <i class='fa fa-download'></i>
+            Export
+          </button>
+        </div>
+      </div>
+    </div>
+    <ul class='list-group list-group-flush'>
+      <li class='list-group-item' *ngFor='let ingredient of getBaseIngredients()'>
+        <div class='row'>
+          <div class='col-2'>{{ ingredient.count}}x</div>
+          <div class='col-3'>{{ asStacks(ingredient.count)}}</div>
+          <icon class='col-7' [item]='itemByID(ingredient.itemID)'></icon>
+        </div>
+      </li>
+    </ul>
+  </div>
+</div>
