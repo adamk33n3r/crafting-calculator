@@ -20,7 +20,7 @@
   <div class='card'>
     <div class='collapse' #ingredients>
       <ul class='list-group list-group-flush' *ngIf='item.baseIngredients'>
-        <li class='list-group-item' *ngFor='let ingredient of item.baseIngredients'>
+        <li class='list-group-item' *ngFor='let ingredient of baseIngredients'>
           {{ ingredient.count }}x <icon [item]='itemByID(ingredient.itemID)'></icon>
         </li>
       </ul>

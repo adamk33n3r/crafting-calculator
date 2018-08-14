@@ -5,7 +5,7 @@ import { Component, OnInit, Input, ViewChild, ElementRef } from '@angular/core';
 declare var $: any;
 
 import { ItemDatabase } from '../../item-database.service';
-import { IItem } from '../../types';
+import { IItem, IIngredient } from '../../types';
 
 @Component({
   selector: 'item',
@@ -20,9 +20,14 @@ export class ItemComponent implements OnInit {
   @ViewChild('ingredients')
   public ingredientsEle: ElementRef;
 
+  public baseIngredients: IIngredients[];
+
   constructor(private itemDB: ItemDatabase) { }
 
   public ngOnInit() {
+    this.baseIngredients = this.itemDB.getBaseIngredients(this.item)
+      .sort((a, b) => b.count - a.count)
+    ;
   }
 
   public itemByID(id: string): IItem {
