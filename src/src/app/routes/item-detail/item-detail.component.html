@@ -4,7 +4,7 @@
   <form [formGroup]='formGroup' autocomplete='off'>
     <label for='item_id'>ID (Auto generated from Name but can be changed)</label>
     <input type='text' class='form-control' id='item_id' placeholder='redstone_dust' formControlName='id' required data-lpignore='true' />
-    <div class='invalid-feedback' *ngIf='formGroup.hasError("exists", "id")'>There is already an item with this ID</div>
+    <div class='invalid-feedback' *ngIf='formGroup.hasError("exists", ["id"])'>There is already an item with this ID</div>
 
     <label for='item_name'>Name</label>
     <input type='text' class='form-control' id='item_name' placeholder='Redstone Dust' formControlName='name' required data-lpignore='true' #nameInput />
