@@ -10,7 +10,7 @@ import { IItem } from '../../types';
 export class IconComponent implements OnInit {
 
   @Input()
-  public item: IItem;
+  public item!: IItem;
 
   constructor() { }
 

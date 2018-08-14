@@ -15,14 +15,14 @@ import { IItem, IIngredient } from '../../types';
 export class ItemComponent implements OnInit {
 
   @Input()
-  public item: IItem;
+  public item!: IItem;
 
   @ViewChild('ingredients')
-  public ingredientsEle: ElementRef;
+  public ingredientsEle!: ElementRef;
 
-  public baseIngredients: IIngredient[];
+  public baseIngredients: IIngredient[] = [];
 
-  constructor(private itemDB: ItemDatabase) { }
+  constructor(private itemDB: ItemDatabase) {}
 
   public ngOnInit() {
     this.baseIngredients = this.itemDB.getBaseIngredients(this.item)
@@ -30,7 +30,7 @@ export class ItemComponent implements OnInit {
     ;
   }
 
-  public itemByID(id: string): IItem {
+  public itemByID(id: string): IItem | undefined {
     return this.itemDB.getItemByID(id);
   }
 

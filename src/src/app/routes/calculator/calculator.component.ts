@@ -16,11 +16,11 @@ interface IItemRow {
 export class CalculatorComponent implements OnInit {
 
   public get DEBUG(): boolean {
-    return !!JSON.parse(localStorage.getItem('debug'));
+    return !!JSON.parse(localStorage.getItem('debug')!);
   }
   public items: IItem[];
   public itemRows: IItemRow[];
-  private cachedIngredients: IIngredient[];
+  private cachedIngredients: IIngredient[] | undefined;
 
   constructor(private itemDB: ItemDatabase) {
     this.items = itemDB.all().filter((item) => item.recipe).reverse();
@@ -30,7 +30,7 @@ export class CalculatorComponent implements OnInit {
   public ngOnInit() {
   }
 
-  public itemByID(id: string): IItem {
+  public itemByID(id: string): IItem | undefined {
     return this.itemDB.getItemByID(id);
   }
 
@@ -50,7 +50,7 @@ export class CalculatorComponent implements OnInit {
     const ingredientMap = new Map<string, number>();
     const ingredients: IIngredient[] = [];
     filtered.forEach((itemRow) => {
-      const baseIngredients = this.itemDB.getBaseIngredients(itemRow.item, itemRow.count);
+      const baseIngredients = this.itemDB.getBaseIngredients(itemRow.item!, itemRow.count);
       baseIngredients.forEach((ingredient) => {
         const previousCount = ingredientMap.get(ingredient.itemID) || 0;
         ingredientMap.set(ingredient.itemID, previousCount + ingredient.count);
@@ -97,7 +97,7 @@ export class CalculatorComponent implements OnInit {
     let result = 'Count,Stacks,Item\n';
 
     ingredients.forEach((ingredient) => {
-      const name = this.itemByID(ingredient.itemID).name;
+      const name = this.itemByID(ingredient.itemID)!.name;
       result += `${ingredient.count},${this.asStacks(ingredient.count)},${name}\n`;
     });
 
@@ -105,7 +105,7 @@ export class CalculatorComponent implements OnInit {
   }
 
   private load(): IItemRow[] {
-    return JSON.parse(localStorage.getItem('calculator'));
+    return JSON.parse(localStorage.getItem('calculator')!);
   }
 
   private save() {

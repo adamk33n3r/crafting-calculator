@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 
-import { IItem, IIngredient } from '../../types';
+import { IItem } from '../../types';
 import { ItemDatabase } from '../../item-database.service';
 
 @Component({
@@ -62,18 +62,24 @@ export class ItemsComponent implements OnInit {
       return;
     }
 
-    (navigator as any).clipboard.readText().then((text) => {
+    (navigator as any).clipboard.readText().then((text: string) => {
       console.log(text);
       this.itemDB.import(text);
       this.items = this.itemDB.all();
-    }).catch((err) => {
+    }).catch((err: any) => {
       console.error(err);
-      alert('You have blocked clipboard permissions. You will not be able to import recipes. If you changed your mind, give clipboard permissions to this site.');
+      alert('You have blocked clipboard permissions. \
+You will not be able to import recipes. If you changed your mind, give clipboard permissions to this site.');
     });
   }
 
-  public reset() {
-    if (confirm('Are you sure you want to reset all items to default?')) {
+  public reset(full?: boolean) {
+    if (full) {
+      if (confirm('Are you sure you want to delete all items?')) {
+        this.itemDB.clear();
+        this.items = this.itemDB.all();
+      }
+    } else if (confirm('Are you sure you want to reset all items to default?')) {
       this.itemDB.resetToDefault();
       this.items = this.itemDB.all();
     }

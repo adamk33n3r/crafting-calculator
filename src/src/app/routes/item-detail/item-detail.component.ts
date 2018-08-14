@@ -11,16 +11,16 @@ import { ItemDatabase } from '../../item-database.service';
 })
 export class ItemDetailComponent implements OnInit {
 
-  // TODO: Calculate actual output count based on recipes of ingredients
+  // TODO: Mobile can't paste an image...
 
   @ViewChild('nameInput')
-  public nameInput: ElementRef;
-  
+  public nameInput!: ElementRef;
+
   @ViewChild('iconInput')
-  public iconInput: ElementRef;
+  public iconInput!: ElementRef;
 
   public get DEBUG(): boolean {
-    return JSON.parse(localStorage.getItem('debug'));
+    return JSON.parse(localStorage.getItem('debug')!);
   }
 
   public formGroup: FormGroup;
@@ -30,7 +30,7 @@ export class ItemDetailComponent implements OnInit {
   }
 
   public get isBaseItem(): boolean {
-    return this.formGroup.get('isBaseItem').value;
+    return this.formGroup.get('isBaseItem')!.value;
   }
 
   public get stateAsName(): string {
@@ -82,22 +82,22 @@ export class ItemDetailComponent implements OnInit {
       isBaseItem: (item.id && !item.recipe) || false,
     });
 
-    this.formGroup.get('isBaseItem').valueChanges.subscribe((isBaseItem) => {
-      const recipe = this.formGroup.get('recipe');
+    this.formGroup.get('isBaseItem')!.valueChanges.subscribe((isBaseItem) => {
+      const recipe = this.formGroup.get('recipe')!;
       isBaseItem ? recipe.disable() : recipe.enable();
     });
     if (item.id && !item.recipe) {
-      this.formGroup.get('recipe').disable();
+      this.formGroup.get('recipe')!.disable();
     }
 
-    const idCtrl = this.formGroup.get('id');
+    const idCtrl = this.formGroup.get('id')!;
     idCtrl.valueChanges.subscribe((id) => {
       if (id === '') {
         idCtrl.markAsPristine();
         idCtrl.markAsUntouched();
       }
     });
-    this.formGroup.get('name').valueChanges.subscribe((name: string) => {
+    this.formGroup.get('name')!.valueChanges.subscribe((name: string) => {
       if (idCtrl.pristine) {
         name = name.toLowerCase()
           .replace(/\s/g, '_')
@@ -122,8 +122,16 @@ export class ItemDetailComponent implements OnInit {
       const data = ev.clipboardData;
       for (let i = 0; i < data.items.length; i++) {
         const item = data.items[i];
-        if (item.kind !== 'file') continue;
+        if (item.kind !== 'file') {
+          continue;
+        }
+
         const file = item.getAsFile();
+        if (!file) {
+          console.error('file is null');
+          alert('Unknown error');
+          return;
+        }
         console.log('Pasted file:', file);
         if (file.size > 100000) {
           alert('Pasted image is too big');
@@ -133,8 +141,8 @@ export class ItemDetailComponent implements OnInit {
         const reader = new FileReader();
         reader.onloadend = () => {
           const base64Img = reader.result;
-          this.formGroup.get('icon').patchValue(base64Img);
-        }
+          this.formGroup.get('icon')!.patchValue(base64Img);
+        };
         reader.readAsDataURL(file);
       }
     });
@@ -170,7 +178,7 @@ export class ItemDetailComponent implements OnInit {
       icon: data.icon,
       recipe: data.recipe ? {
         outputCount: data.recipe.outputCount,
-        ingredients: data.recipe.ingredients.map((ingredient) => {
+        ingredients: data.recipe.ingredients.map((ingredient: { count: number, item: IItem }) => {
           return {
             count: ingredient.count,
             itemID: ingredient.item.id,

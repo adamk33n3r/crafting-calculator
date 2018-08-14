@@ -1,21 +1,31 @@
 <div class='container'>
-  <div class='mt-4 row'>
-    <div class='col-md-4 col-6'>
-      <button type='button' class='btn btn-outline-dark' (click)='dump()'>
+  <div class='row mt-4'>
+    <div class='col-12 btn-group'>
+      <button type='button' class='btn btn-outline-dark w-50' (click)='dump()'>
         <i class='far fa-copy'></i>
-        Dump Items to Clipboard
+        Copy Items
       </button>
-    </div>
-    <div class='col-md-4 col-6'>
-      <button type='button' class='btn btn-outline-dark' (click)='import()'>
+
+      <button type='button' class='btn btn-outline-dark w-50' (click)='import()'>
         <i class='fa fa-paste'></i>
-        Import Items from Clipboard
+        Paste Items
       </button>
     </div>
-    <div class='col-md-4 mt-2 mt-md-0'>
-      <button type='button' class='btn btn-danger float-right' (click)='reset()'>
-        <i class='far fa-trash-alt'></i> Reset to Default
-      </button>
+  </div>
+  <div class='mt-2'>
+    <div class='col-'>
+      <div class='btn-group ml-2 float-right'>
+        <button type='button' class='btn btn-danger' (click)='reset()'>
+          <i class='far fa-trash-alt'></i> Reset to Default
+        </button>
+        <button type='button' class='btn btn-danger' (click)='reset(true)'>
+          <i class='far fa-trash-alt'></i> Delete All
+        </button>
+      </div>
+      <p>
+        You can dump the current items to your clipboard as JSON. You can also import JSON from your clipboard.
+        This makes it easy to share or archive lists of items and their recipes.
+      </p>
     </div>
   </div>
 

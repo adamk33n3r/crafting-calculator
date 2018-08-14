@@ -6,10 +6,10 @@ import BUILTINS from './item-builtins';
 
 @Injectable()
 export class ItemDatabase {
-  
+
   private items: IItem[] = [];
   private get DEBUG(): boolean {
-    return !!JSON.parse(localStorage.getItem('debug'));
+    return !!JSON.parse(localStorage.getItem('debug')!);
   }
 
   constructor() {
@@ -23,11 +23,6 @@ export class ItemDatabase {
     } else {
       this.items = this.getBuiltins();
     }
-    // const builtins = this.getBuiltins();
-    // this.items = ([] as any).concat(
-    //   this.getBuiltins(),
-    //   this.getLocalStorage(),
-    // );
   }
 
   public all(): IItem[] {
@@ -50,7 +45,7 @@ export class ItemDatabase {
       this.items[idx] = item;
     }
 
-    //this.debug(JSON.stringify(this.items, null, 2));
+    // this.debug(JSON.stringify(this.items, null, 2));
 
     this.saveItems();
     return item;
@@ -82,6 +77,10 @@ export class ItemDatabase {
     this.saveItems();
   }
 
+  public clear(): void {
+    localStorage.setItem('items', '[]');
+  }
+
   public resetToDefault(): void {
     localStorage.removeItem('items');
     this.refreshDB();
@@ -102,7 +101,8 @@ export class ItemDatabase {
     } catch (e) {
       console.error('Could not parse stored JSON', e);
       this.debug(localStorage.getItem('items'));
-      if (confirm('Could not parse stored JSON. Click OK to reset or click Cancel to try and fix it yourself. Items are stored in localStorage["items"]')) {
+      if (confirm('Could not parse stored JSON. Click OK to reset or click Cancel to try and fix it yourself.\
+Items are stored in localStorage["items"]')) {
         this.resetToDefault();
       }
 
@@ -167,8 +167,8 @@ export class ItemDatabase {
           const count = ingredient.count / item.recipe!.outputCount;
           const previousCount = baseMap.get(subItem.id) || 0;
           baseMap.set(subItem.id, previousCount + count);
-          //const previousCount2 = baseMap2.get(subItem.id) || 0;
-          //baseMap2.set(subItem.id, previousCount2 + ingredient.count);
+          // const previousCount2 = baseMap2.get(subItem.id) || 0;
+          // baseMap2.set(subItem.id, previousCount2 + ingredient.count);
           baseRecipes.push({ count: ingredient.count, itemID: subItem.id, outputCount: item.recipe!.outputCount });
         } else {
           // Has base ingredients
@@ -176,14 +176,15 @@ export class ItemDatabase {
 
           subItem.baseIngredients.forEach((baseIngredient, i) => {
             const baseIngredient2 = subItem.baseRecipes![i];
-            this.debug(`${baseIngredient.count * subItem.recipe!.outputCount} ${baseIngredient.itemID} makes ${subItem.recipe!.outputCount} ${subItem.id}`);
+            this.debug(`${baseIngredient.count * subItem.recipe!.outputCount}\
+${baseIngredient.itemID} makes ${subItem.recipe!.outputCount} ${subItem.id}`);
             this.debug(`We need ${ingredient.count} ${subItem.id}`);
             const count = (ingredient.count / item.recipe!.outputCount) * baseIngredient.count;
             this.debug(`So therefore we need ${count} ${baseIngredient.itemID}`);
             const previousCount = baseMap.get(baseIngredient.itemID) || 0;
             baseMap.set(baseIngredient.itemID, previousCount + count);
-            //const previousCount2 = baseMap2.get(baseIngredient.itemID) || 0;
-            //baseMap2.set(baseIngredient.itemID, previousCount2 + baseIngredient2.count);
+            // const previousCount2 = baseMap2.get(baseIngredient.itemID) || 0;
+            // baseMap2.set(baseIngredient.itemID, previousCount2 + baseIngredient2.count);
             baseRecipes.push({ count: baseIngredient2.count, itemID: baseIngredient.itemID, outputCount: subItem.recipe!.outputCount });
           });
         }
@@ -195,9 +196,9 @@ export class ItemDatabase {
     baseMap.forEach((count, itemID) => {
       baseIngredients.push({ count, itemID });
     });
-    //baseMap2.forEach((count, itemID) => {
+    // baseMap2.forEach((count, itemID) => {
     //  baseRecipes.push({ count, itemID });
-    //});
+    // });
     this.debug();
     return [baseIngredients, baseRecipes];
   }
@@ -214,7 +215,7 @@ export class ItemDatabase {
     if (!this.DEBUG) {
       return;
     }
-    
+
     console.log.apply(console, data);
   }
 
