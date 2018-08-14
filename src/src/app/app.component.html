@@ -1,5 +1,5 @@
 <nav class='navbar navbar-dark bg-primary navbar-expand sticky-top'>
-    <a class='navbar-brand' routerLink=''>Recipe Calculator</a>
+    <a class='navbar-brand' routerLink=''>Ingredient Calculator</a>
     <ul class='nav navbar-nav' >
       <li class='nav-item' routerLinkActive='active' [routerLinkActiveOptions]="{exact:
 true}">
@@ -21,7 +21,7 @@ true}">
 <footer class='footer bg-light'>
   <div class='container'>
     <div class='float-left'>
-      Made by the power of <icon [item]='itemDB.getItemByID("redstone_dust")'></icon>
+      Made by the power of <img class='item-icon' [src]='itemDB.getItemByID("redstone_dust").icon' />
     </div>
     <div class='float-right'>&copy; Adam Keenan</div>
   </div>
