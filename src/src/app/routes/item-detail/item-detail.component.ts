@@ -66,6 +66,10 @@ export class ItemDetailComponent implements OnInit {
       id: [ item.id || '', [
         Validators.required,
         (ctrl: AbstractControl) => {
+          if (ctrl.value === this.currentID) {
+            return null;
+          }
+
           return this.itemDB.getItemByID(ctrl.value) ? { exists: true } : null;
         }
       ]],
