@@ -20,7 +20,7 @@ export class ItemComponent implements OnInit {
   @ViewChild('ingredients')
   public ingredientsEle: ElementRef;
 
-  public baseIngredients: IIngredients[];
+  public baseIngredients: IIngredient[];
 
   constructor(private itemDB: ItemDatabase) { }
 
