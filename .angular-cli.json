@@ -17,7 +17,8 @@
         "mstile-150x150.png",
         "browserconfig.xml",
         "safari-pinned-tab.svg",
-        "site.webmanifest"
+        "site.webmanifest",
+        "_redirects"
       ],
       "index": "index.html",
       "main": "src/main.ts",
