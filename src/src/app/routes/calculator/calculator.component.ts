@@ -104,12 +104,28 @@ export class CalculatorComponent implements OnInit {
     return result;
   }
 
-  private load(): IItemRow[] {
-    return JSON.parse(localStorage.getItem('calculator')!);
+  private load(): IItemRow[] | null {
+    const calc = JSON.parse(localStorage.getItem('calculator')!) as IIngredient[];
+    if (!calc) {
+      return null;
+    }
+
+    return calc.map((itemRow) => {
+      return {
+        count: itemRow.count,
+        item: this.itemByID(itemRow.itemID)!,
+      };
+    });
   }
 
   private save() {
-    localStorage.setItem('calculator', JSON.stringify(this.itemRows));
+    const filtered = this.itemRows.filter((itemRow) => itemRow.item);
+    localStorage.setItem('calculator', JSON.stringify(filtered.map((itemRow) => {
+      return {
+        count: itemRow.count,
+        itemID: itemRow.item!.id,
+      };
+    })));
   }
 
 }
