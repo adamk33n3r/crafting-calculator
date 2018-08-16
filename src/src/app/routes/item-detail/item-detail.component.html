@@ -9,7 +9,7 @@
     <label for='item_name'>Name</label>
     <input type='text' class='form-control' id='item_name' placeholder='Redstone Dust' formControlName='name' required data-lpignore='true' #nameInput />
 
-    <label for='item_icon'>Icon <img class='item-icon' [src]='formGroup.get("icon").value' /></label>
+    <label for='item_icon'>Icon <img class='item-icon' [src]='formGroup.get("icon")!.value' /></label>
     <input type='text' class='form-control' id='item_icon' placeholder='Paste image here' formControlName='icon' data-lpignore='true' readonly #iconInput />
     <br />
 
