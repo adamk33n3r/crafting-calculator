@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
-import { FormGroup, FormArray, FormControl, FormBuilder, Validators, AbstractControl } from '@angular/forms';
+import { FormGroup, FormArray, FormBuilder, Validators, AbstractControl } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 
 import { IItem, IIngredient, PageState } from '../../types';
@@ -23,7 +23,7 @@ export class ItemDetailComponent implements OnInit {
     return JSON.parse(localStorage.getItem('debug')!);
   }
 
-  public formGroup: FormGroup;
+  public formGroup!: FormGroup;
 
   public get ingredients(): FormArray {
     return this.formGroup.get('recipe.ingredients') as FormArray;
@@ -43,76 +43,21 @@ export class ItemDetailComponent implements OnInit {
 
   public items: IItem[] = [];
 
-  private currentID: string;
+  private currentID: string = '';
 
   public constructor(
     private itemDB: ItemDatabase,
     private formBuilder: FormBuilder,
     private router: Router,
     private route: ActivatedRoute,
-  ) {
-    this.currentID = this.route.snapshot.params.id;
-    const item = this.itemDB.getItemByID(this.currentID) || {} as IItem;
-    const ingredientArray = this.formBuilder.array([]);
-    if (item.recipe) {
-      console.log(item);
-      item.recipe.ingredients.forEach((ingredient) => {
-        ingredientArray.push(this.newIngredient(ingredient));
-      });
-    } else {
-      ingredientArray.push(this.newIngredient());
-    }
-    this.formGroup = this.formBuilder.group({
-      id: [ item.id || '', [
-        Validators.required,
-        (ctrl: AbstractControl) => {
-          if (ctrl.value === this.currentID) {
-            return null;
-          }
-
-          return this.itemDB.getItemByID(ctrl.value) ? { exists: true } : null;
-        }
-      ]],
-      name: [ item.name || '', Validators.required ],
-      icon: [ item.icon || '', Validators.required ],
-      recipe: this.formBuilder.group({
-        outputCount: (item.recipe && item.recipe.outputCount) || 1,
-        ingredients: ingredientArray,
-      }),
-      isBaseItem: (item.id && !item.recipe) || false,
-    });
-
-    this.formGroup.get('isBaseItem')!.valueChanges.subscribe((isBaseItem) => {
-      const recipe = this.formGroup.get('recipe')!;
-      isBaseItem ? recipe.disable() : recipe.enable();
-    });
-    if (item.id && !item.recipe) {
-      this.formGroup.get('recipe')!.disable();
-    }
-
-    const idCtrl = this.formGroup.get('id')!;
-    idCtrl.valueChanges.subscribe((id) => {
-      if (id === '') {
-        idCtrl.markAsPristine();
-        idCtrl.markAsUntouched();
-      }
-    });
-    this.formGroup.get('name')!.valueChanges.subscribe((name: string) => {
-      if (idCtrl.pristine) {
-        name = name.toLowerCase()
-          .replace(/\s/g, '_')
-          .replace(/-/g, '_')
-          .replace(/[()]/g, '')
-        ;
-        idCtrl.patchValue(name);
-        idCtrl.markAsTouched();
-      }
-    });
-
-    (window as any).DB = this.itemDB;
-  }
+  ) {}
 
   public ngOnInit() {
+    this.route.paramMap.subscribe((params) => {
+      this.currentID = params.get('id')!;
+      this.init();
+    });
+
     this.items = this.itemDB.all().slice().reverse();
 
     const iconInput = (this.iconInput.nativeElement as HTMLInputElement);
@@ -170,6 +115,11 @@ export class ItemDetailComponent implements OnInit {
     this.ingredients.removeAt(idx);
   }
 
+  public goToItem(idx: number) {
+    console.log(this.ingredients.at(idx).value.item);
+    this.router.navigate([ 'items', this.ingredients.at(idx).value.item.id ]);
+  }
+
   public save() {
     const data = this.formGroup.value;
     const item: IItem = {
@@ -193,6 +143,65 @@ export class ItemDetailComponent implements OnInit {
 
     this.itemDB.add(item);
     this.router.navigate([ 'items' ]);
+  }
+
+  public init() {
+    const item = this.itemDB.getItemByID(this.currentID) || {} as IItem;
+    const ingredientArray = this.formBuilder.array([]);
+    if (item.recipe) {
+      console.log(item);
+      item.recipe.ingredients.forEach((ingredient) => {
+        ingredientArray.push(this.newIngredient(ingredient));
+      });
+    } else {
+      ingredientArray.push(this.newIngredient());
+    }
+    this.formGroup = this.formBuilder.group({
+      id: [ item.id || '', [
+        Validators.required,
+        (ctrl: AbstractControl) => {
+          if (ctrl.value === this.currentID) {
+            return null;
+          }
+
+          return this.itemDB.getItemByID(ctrl.value) ? { exists: true } : null;
+        }
+      ]],
+      name: [ item.name || '', Validators.required ],
+      icon: [ item.icon || '', Validators.required ],
+      recipe: this.formBuilder.group({
+        outputCount: (item.recipe && item.recipe.outputCount) || 1,
+        ingredients: ingredientArray,
+      }),
+      isBaseItem: (item.id && !item.recipe) || false,
+    });
+
+    this.formGroup.get('isBaseItem')!.valueChanges.subscribe((isBaseItem) => {
+      const recipe = this.formGroup.get('recipe')!;
+      isBaseItem ? recipe.disable() : recipe.enable();
+    });
+    if (item.id && !item.recipe) {
+      this.formGroup.get('recipe')!.disable();
+    }
+
+    const idCtrl = this.formGroup.get('id')!;
+    idCtrl.valueChanges.subscribe((id) => {
+      if (id === '') {
+        idCtrl.markAsPristine();
+        idCtrl.markAsUntouched();
+      }
+    });
+    this.formGroup.get('name')!.valueChanges.subscribe((name: string) => {
+      if (idCtrl.pristine) {
+        name = name.toLowerCase()
+          .replace(/\s/g, '_')
+          .replace(/-/g, '_')
+          .replace(/[()]/g, '')
+        ;
+        idCtrl.patchValue(name);
+        idCtrl.markAsTouched();
+      }
+    });
   }
 
 }

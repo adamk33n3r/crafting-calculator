@@ -7,6 +7,7 @@ export interface IBaseRecipe {
   count: number;
   outputCount: number;
   itemID: string;
+  needed: number;
 }
 
 export interface IItem {

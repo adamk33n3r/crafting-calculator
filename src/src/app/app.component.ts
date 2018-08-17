@@ -17,6 +17,8 @@ export class AppComponent  {
     //   - 6 insulated copper cable
     // `);
 
+    (window as any).DB = this.itemDB;
+
     (Storage.prototype as any).size = function(units: string) {
         'use strict';
         units = units ? units.toUpperCase() : 'MB';

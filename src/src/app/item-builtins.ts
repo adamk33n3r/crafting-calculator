@@ -32,7 +32,8 @@ export default [
       {
         "count": 1,
         "itemID": "wood_log",
-        "outputCount": 4
+        "outputCount": 4,
+        "needed": 1,
       }
     ]
   },

@@ -92,7 +92,7 @@ export class ItemDatabase {
 
   private getBuiltins(): IItem[] {
     const builtins = BUILTINS as IItem[];
-    return BUILTINS;
+    return builtins;
   }
 
   private getLocalStorage(): IItem[] {
@@ -117,24 +117,34 @@ Items are stored in localStorage["items"]')) {
   public getBaseIngredients(item: IItem, count: number = 1): IIngredient[] {
     const baseIngredients = item.baseIngredients || [];
     const baseRecipes = item.baseRecipes || [];
-    this.debug('base:', baseIngredients, baseRecipes);
-    const baseMap = new Map<string, number>();
+    this.debug('baseIngredients:', baseIngredients);
+    this.debug('baseRecipes:', baseRecipes);
+    const baseRecipesMap = new Map<string, number>();
 
+    this.debug();
+    this.debug('Aggregating all baseRecipes...');
     baseRecipes.forEach((baseRecipe) => {
-      this.debug('processing base:', baseRecipe);
-      const howManyRecipesToMake = (this.roundToMult(count, baseRecipe.outputCount) / baseRecipe.outputCount) * baseRecipe.count;
-      this.debug(count, baseRecipe.outputCount, howManyRecipesToMake, baseRecipe.count);
-      const previousCount = baseMap.get(baseRecipe.itemID) || 0;
-      baseMap.set(baseRecipe.itemID, previousCount + howManyRecipesToMake);
+      this.debug('processing baseRecipe:', baseRecipe);
+
+      const howManyToMake = (
+        this.roundToMult(baseRecipe.needed * count, baseRecipe.outputCount
+      ) / baseRecipe.outputCount) * baseRecipe.count;
+
+      this.debug(count, baseRecipe.outputCount, howManyToMake, baseRecipe.count);
+      const previousCount = baseRecipesMap.get(baseRecipe.itemID) || 0;
+      baseRecipesMap.set(baseRecipe.itemID, previousCount + howManyToMake);
     });
+    this.debug('Final map:', baseRecipesMap);
+    this.debug();
 
     return baseIngredients.map((ingredient, i) => {
-      const multiplier = baseMap.get(ingredient.itemID)!;
+      const multiplier = baseRecipesMap.get(ingredient.itemID)!;
       this.debug('things:', ingredient.count, count, ingredient.count * count, multiplier);
-      this.debug(ingredient.itemID, this.roundToMult(ingredient.count * count, multiplier));
+      this.debug('setting base to:', ingredient.itemID, this.roundToMult(ingredient.count, multiplier));
+      this.debug(ingredient.count, multiplier, this.roundToMult(ingredient.count, multiplier));
       return {
         // count: Math.ceil(ingredient.count * count),
-        count: this.roundToMult((ingredient.count * count), multiplier),
+        count: this.roundToMult((ingredient.count), multiplier),
         itemID: ingredient.itemID,
       };
     });
@@ -145,9 +155,9 @@ Items are stored in localStorage["items"]')) {
     this.debug('Calculating base for:', item.id);
     this.debug('===================================');
 
-    if (item.baseIngredients && item.baseRecipes) {
-      return [item.baseIngredients, item.baseRecipes];
-    }
+    // if (item.baseIngredients && item.baseRecipes) {
+    //   return [item.baseIngredients, item.baseRecipes];
+    // }
 
     const baseIngredients: IIngredient[] = [];
     const baseRecipes: IBaseRecipe[] = [];
@@ -169,15 +179,19 @@ Items are stored in localStorage["items"]')) {
           baseMap.set(subItem.id, previousCount + count);
           // const previousCount2 = baseMap2.get(subItem.id) || 0;
           // baseMap2.set(subItem.id, previousCount2 + ingredient.count);
-          baseRecipes.push({ count: ingredient.count, itemID: subItem.id, outputCount: item.recipe!.outputCount });
+          baseRecipes.push({
+            count: ingredient.count,
+            itemID: ingredient.itemID,
+            outputCount: item.recipe!.outputCount,
+            needed: 1,
+          });
         } else {
           // Has base ingredients
           this.debug('IS NOT BASE ITEM:', subItem.id);
 
           subItem.baseIngredients.forEach((baseIngredient, i) => {
-            const baseIngredient2 = subItem.baseRecipes![i];
             this.debug(`${baseIngredient.count * subItem.recipe!.outputCount}\
-${baseIngredient.itemID} makes ${subItem.recipe!.outputCount} ${subItem.id}`);
+ ${baseIngredient.itemID} makes ${subItem.recipe!.outputCount} ${subItem.id}`);
             this.debug(`We need ${ingredient.count} ${subItem.id}`);
             const count = (ingredient.count / item.recipe!.outputCount) * baseIngredient.count;
             this.debug(`So therefore we need ${count} ${baseIngredient.itemID}`);
@@ -185,8 +199,29 @@ ${baseIngredient.itemID} makes ${subItem.recipe!.outputCount} ${subItem.id}`);
             baseMap.set(baseIngredient.itemID, previousCount + count);
             // const previousCount2 = baseMap2.get(baseIngredient.itemID) || 0;
             // baseMap2.set(baseIngredient.itemID, previousCount2 + baseIngredient2.count);
-            baseRecipes.push({ count: baseIngredient2.count, itemID: baseIngredient.itemID, outputCount: subItem.recipe!.outputCount });
+
+            // const baseIngredient2 = subItem.baseRecipes![i];
+            // baseRecipes.push({
+            //   count: baseIngredient2.count,
+            //   itemID: baseIngredient.itemID,
+            //   outputCount: subItem.recipe!.outputCount,
+            //   needed: ingredient.count,
+            // });
           });
+
+          this.debug('doing:', ingredient);
+          subItem.baseRecipes!.forEach((baseRecipe) => {
+            this.debug('THINGSGASDFSADF:', baseRecipe);
+            this.debug(baseRecipe.needed, ingredient.count);
+            baseRecipes.push({
+              count: baseRecipe.count,
+              itemID: baseRecipe.itemID,
+              outputCount: baseRecipe.outputCount,
+              // needed: ingredient.count, // maybe need to accum?
+              needed: baseRecipe.needed * ingredient.count / item.recipe!.outputCount,
+            });
+          });
+          this.debug('after');
         }
       });
     } else {
