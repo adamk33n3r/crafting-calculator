@@ -86,32 +86,12 @@ export class ItemDatabase {
     this.refreshDB();
   }
 
+  public recalculate(): void {
+    this.items.filter(item => item.recipe).forEach(item => this.add(item));
+  }
+
   public getItemByID(id: string): IItem | undefined {
     return this.items.find((item) => item.id === id);
-  }
-
-  private getBuiltins(): IItem[] {
-    const builtins = BUILTINS as IItem[];
-    return builtins;
-  }
-
-  private getLocalStorage(): IItem[] {
-    try {
-      return JSON.parse(localStorage.getItem('items')!) || [];
-    } catch (e) {
-      console.error('Could not parse stored JSON', e);
-      this.debug(localStorage.getItem('items'));
-      if (confirm('Could not parse stored JSON. Click OK to reset or click Cancel to try and fix it yourself.\
-Items are stored in localStorage["items"]')) {
-        this.resetToDefault();
-      }
-
-      return [];
-    }
-  }
-
-  private saveItems(): void {
-    localStorage.setItem('items', JSON.stringify(this.items));
   }
 
   public getBaseIngredients(item: IItem, count: number = 1): IIngredient[] {
@@ -148,6 +128,30 @@ Items are stored in localStorage["items"]')) {
         itemID: ingredient.itemID,
       };
     });
+  }
+
+  private getBuiltins(): IItem[] {
+    const builtins = BUILTINS as IItem[];
+    return builtins;
+  }
+
+  private getLocalStorage(): IItem[] {
+    try {
+      return JSON.parse(localStorage.getItem('items')!) || [];
+    } catch (e) {
+      console.error('Could not parse stored JSON', e);
+      this.debug(localStorage.getItem('items'));
+      if (confirm('Could not parse stored JSON. Click OK to reset or click Cancel to try and fix it yourself.\
+Items are stored in localStorage["items"]')) {
+        this.resetToDefault();
+      }
+
+      return [];
+    }
+  }
+
+  private saveItems(): void {
+    localStorage.setItem('items', JSON.stringify(this.items));
   }
 
   private calculateBaseIngredients(item: IItem): [IIngredient[], IBaseRecipe[]] | undefined {

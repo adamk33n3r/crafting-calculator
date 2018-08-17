@@ -85,4 +85,8 @@ You will not be able to import recipes. If you changed your mind, give clipboard
     }
   }
 
+  public recalculate() {
+    this.itemDB.recalculate();
+  }
+
 }
