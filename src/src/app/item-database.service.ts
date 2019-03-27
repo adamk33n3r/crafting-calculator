@@ -107,10 +107,10 @@ export class ItemDatabase {
       this.debug('processing baseRecipe:', baseRecipe);
 
       const howManyToMake = (
-        this.roundToMult(baseRecipe.needed * count, baseRecipe.outputCount
+        this.roundToMult(baseRecipe.needed * this.roundToMult(count, item.recipe!.outputCount), baseRecipe.outputCount
       ) / baseRecipe.outputCount) * baseRecipe.count;
 
-      this.debug(count, baseRecipe.outputCount, howManyToMake, baseRecipe.count);
+      this.debug(baseRecipe.needed, count, baseRecipe.outputCount, howManyToMake, baseRecipe.count);
       const previousCount = baseRecipesMap.get(baseRecipe.itemID) || 0;
       baseRecipesMap.set(baseRecipe.itemID, previousCount + howManyToMake);
     });
@@ -216,13 +216,17 @@ Items are stored in localStorage["items"]')) {
           this.debug('doing:', ingredient);
           subItem.baseRecipes!.forEach((baseRecipe) => {
             this.debug('THINGSGASDFSADF:', baseRecipe);
-            this.debug(baseRecipe.needed, ingredient.count);
+            this.debug(baseRecipe.needed, ingredient.count, subItem.recipe!.outputCount,
+              baseRecipe.needed * ingredient.count / item.recipe!.outputCount,
+              baseRecipe.needed * subItem.recipe!.outputCount,
+            );
             baseRecipes.push({
               count: baseRecipe.count,
               itemID: baseRecipe.itemID,
               outputCount: baseRecipe.outputCount,
               // needed: ingredient.count, // maybe need to accum?
-              needed: baseRecipe.needed * ingredient.count / item.recipe!.outputCount,
+              // needed: baseRecipe.needed * ingredient.count / item.recipe!.outputCount,
+              needed: baseRecipe.needed * ingredient.count,
             });
           });
           this.debug('after');

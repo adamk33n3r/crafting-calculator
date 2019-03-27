@@ -30,6 +30,11 @@ DB.add({
 });
 
 DB.add({
+  id: 'bronze_ingot',
+  name: 'Bronze Ingot',
+});
+
+DB.add({
   id: 'copper_ingot',
   name: 'copper Ingot',
 });
@@ -99,7 +104,6 @@ DB.add({
   }
 });
 
-localStorage.setItem('debug', 'true');
 DB.add({
   id: 'tin_item_casing',
   name: 'Tin Item Casing',
@@ -113,7 +117,6 @@ DB.add({
     ]
   }
 });
-localStorage.setItem('debug', 'false');
 
 DB.add({
   id: 'electric_motor',
@@ -179,6 +182,20 @@ DB.add({
   },
 });
 
+DB.add({
+  id: 'bronze_plate',
+  name: 'Bronze Plate',
+  recipe: {
+    outputCount: 1,
+    ingredients: [
+      {
+        count: 1,
+        itemID: 'bronze_ingot',
+      },
+    ],
+  },
+});
+
 const heatVent = DB.add({
   id: 'heat_vent',
   name: 'Heat Vent',
@@ -237,7 +254,43 @@ const overclockedHeatVent = DB.add({
   },
 });
 
-// localStorage.setItem('debug', 'true');
+const mixedMetalIngot = DB.add({
+  id: 'mixed_metal_ingot',
+  name: 'Mixed Metal Ingot',
+  recipe: {
+    outputCount: 2,
+    ingredients: [
+      {
+        count: 3,
+        itemID: 'iron_plate',
+      },
+      {
+        count: 3,
+        itemID: 'bronze_plate',
+      },
+      {
+        count: 3,
+        itemID: 'tin_plate',
+      },
+    ],
+  },
+});
+
+localStorage.setItem('debug', 'true');
+const advancedAlloy = DB.add({
+  id: 'advanced_alloy',
+  name: 'Advanced Alloy',
+  recipe: {
+    outputCount: 1,
+    ingredients: [
+      {
+        count: 1,
+        itemID: 'mixed_metal_ingot',
+      }
+    ],
+  },
+});
+localStorage.setItem('debug', 'false');
 
 // console.log(JSON.stringify(heatVent, null, 2));
 console.log();
@@ -245,7 +298,7 @@ console.log('===========NEW RUN===========');
 console.log();
 // console.log(DB.getBaseIngredients(heatVent, 1));
 console.log();
-console.log(DB.getBaseIngredients(heatVent, 5));
+// console.log(DB.getBaseIngredients(heatVent, 5));
 // console.log();
 // console.log(DB.getBaseIngredients(reactorHeatVent, 1));
 // console.log();
@@ -270,6 +323,14 @@ console.log(DB.getBaseIngredients(heatVent, 5));
 
 // 9 - 81
 
+
+localStorage.setItem('debug', 'true');
+
+console.log(DB.getBaseIngredients(advancedAlloy, 3));
+// console.log(DB.getBaseIngredients(advancedAlloy, 2));
+
+localStorage.setItem('debug', 'false');
+
 const NUMVALS = 100;
 
 const heatVentTestValues: { [idx: string]: number[] } = {
@@ -283,13 +344,39 @@ for (let i = 1; i <= NUMVALS; i++) {
   heatVentTestValues.copper_ingot.push(Math.ceil((16 * i) / 3));
 }
 
-for (const itemID in heatVentTestValues) {
-  if (heatVentTestValues.hasOwnProperty(itemID)) {
+// for (const itemID in heatVentTestValues) {
+//   if (heatVentTestValues.hasOwnProperty(itemID)) {
+//     console.log(`Checking ${itemID}`);
+//     for (let i = 0; i < NUMVALS; i++) {
+//       const base = DB.getBaseIngredients(heatVent, i + 1);
+//       const count = base.find((ingredient) => ingredient.itemID === itemID)!.count;
+//       const val = heatVentTestValues[itemID][i];
+//       // console.log(count, val);
+//       if (count !== val) {
+//         throw new Error(`ERROR! Got ${count} should be ${val}`);
+//       }
+//     }
+//   }
+// }
+
+const mixedMetalIngotTestValues: { [idx: string]: number[] } = {
+  bronze_ingot: [],
+  iron_ingot: [],
+  tin_ingot: [],
+};
+for (let i = 1; i <= NUMVALS; i++) {
+  mixedMetalIngotTestValues.iron_ingot.push(3 * Math.ceil(i / 2));
+  mixedMetalIngotTestValues.tin_ingot.push(3 * Math.ceil(i / 2));
+  mixedMetalIngotTestValues.bronze_ingot.push(3 * Math.ceil(i / 2));
+}
+
+for (const itemID in mixedMetalIngotTestValues) {
+  if (mixedMetalIngotTestValues.hasOwnProperty(itemID)) {
     console.log(`Checking ${itemID}`);
     for (let i = 0; i < NUMVALS; i++) {
-      const base = DB.getBaseIngredients(heatVent, i + 1);
+      const base = DB.getBaseIngredients(mixedMetalIngot, i + 1);
       const count = base.find((ingredient) => ingredient.itemID === itemID)!.count;
-      const val = heatVentTestValues[itemID][i];
+      const val = mixedMetalIngotTestValues[itemID][i];
       // console.log(count, val);
       if (count !== val) {
         throw new Error(`ERROR! ${count} !== ${val}`);
@@ -300,5 +387,4 @@ for (const itemID in heatVentTestValues) {
 
 console.log('All tests passed!');
 
-console.log(DB.getBaseIngredients(heatVent, 0));
 
